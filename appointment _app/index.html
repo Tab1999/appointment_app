@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Simple Form</title>
+</head>
+
+<body>
+    <h1>Submit Form</h1>
+
+    <form id="userForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <label for ="phone">Phone Number:</label>
+        <input type="tel" id="phone" name="phone" required><br><br>
+
+        <input type="button" value="Submit" id="submitBtn">
+    </form>
+    <h2>Users:</h2>
+    <div id="userList"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.1/axios.min.js"></script>
+
+    <script>
+        // Function to handle form submission
+        function saveToLocalStorage() {
+            const nameInput = document.getElementById("name");
+            const emailInput = document.getElementById("email");
+            const phoneInput = document.getElementById("phone");
+
+            const name = nameInput.value;
+            const email = emailInput.value;
+            const phone = phoneInput.value;
+
+            if (name && email && phone) {
+                const userData = {
+                    name: name,
+                    email: email,
+                    phone: phone
+                };
+                
+                axios.post('https://crudcrud.com/api/4bf426fb83884c9aabe63ab483b43630/appointmentdata', userData)
+                .then((response)=>{
+                    showUsersOnScreen(response.data);
+                    console.log(response);
+                })
+                .catch((err)=>{
+                    document.body.innerHTML = document.body.innerHTML +"<h4> something went wrong </h4>"
+                    console.log(err);
+                })
+                // Save the user data to local storage
+                // localStorage.setItem('userData', JSON.stringify(userData));
+
+                // Clear input fields
+                nameInput.value = '';
+                emailInput.value = '';
+                phoneInput.value = '';
+
+                alert('Data saved to local storage.');
+                showUsersOnScreen();
+            } else {
+                alert('Please fill in all fields.');
+            }
+        }
+        // Function to display users on the screen
+            function showUsersOnScreen() {
+                const userListDiv = document.getElementById("userList");
+                const userDataString = localStorage.getItem('userData');
+                if (userDataString) {
+                    const userData = JSON.parse(userDataString);
+                    userListDiv.innerHTML = `
+                    <strong>Name:</strong> ${userData.name}<br>
+                    <strong>Email:</strong> ${userData.email}<br>
+                    <strong>Phone:</strong> ${userData.phone}<br>
+                `;
+                } else {
+                    userListDiv.innerHTML = "No user data found.";
+                }
+            }
+
+        // Attach the saveToLocalStorage function to the submit button's click event
+        document.getElementById("submitBtn").addEventListener("click", saveToLocalStorage);
+        showUsersOnScreen();
+    </script>
+</body>
+
+</html>
